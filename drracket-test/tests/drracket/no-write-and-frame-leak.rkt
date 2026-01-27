@@ -1,5 +1,9 @@
 #lang racket
 
+(module+ test
+  (module config info
+    (define lock-name "x-server")))
+
 #|
 
 This test checks:

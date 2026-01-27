@@ -1,4 +1,8 @@
 #lang racket
+
+(module+ test
+  (module config info
+    (define lock-name "x-server")))
 (require "../private/drracket-test-util.rkt"
          (prefix-in fw: framework)
          racket/gui/base

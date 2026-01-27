@@ -34,4 +34,5 @@
 
 (module+ test
   (module config info
+    (define lock-name "x-server")
     (define random? #t)))

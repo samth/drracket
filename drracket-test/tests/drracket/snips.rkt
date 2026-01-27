@@ -28,4 +28,5 @@
 
 (module+ test
   (module config info
+    (define lock-name "x-server")
     (define timeout 200)))

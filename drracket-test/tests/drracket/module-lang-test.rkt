@@ -1254,4 +1254,5 @@ f: contract violation
   (parameterize ([current-error-port outp])
     (dynamic-require (quote-module-path "..") #f))
   (module config info
+    (define lock-name "x-server")
     (define timeout 800)))

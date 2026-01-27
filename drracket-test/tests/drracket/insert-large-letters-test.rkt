@@ -1,5 +1,9 @@
 #lang racket
 
+(module+ test
+  (module config info
+    (define lock-name "x-server")))
+
 (require tests/drracket/private/drracket-test-util
          drracket/private/local-member-names
          racket/gui/base
@@ -33,4 +37,3 @@
      (error 'insert-large-letters-test.rkt 
             "expected more semis or spaces; definitions content was:\n~a"
             defs-content))))
-

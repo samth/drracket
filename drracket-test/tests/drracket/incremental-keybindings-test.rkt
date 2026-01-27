@@ -1,4 +1,8 @@
 #lang racket/base
+
+(module+ test
+  (module config info
+    (define lock-name "x-server")))
 #|
 
 Adds the incremental-keybindings.rkt file (also shown in the docs)

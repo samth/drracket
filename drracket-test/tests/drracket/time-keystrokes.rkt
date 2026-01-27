@@ -1,5 +1,9 @@
 #lang racket
 
+(module+ test
+  (module config info
+    (define lock-name "x-server")))
+
 (require drracket/tool
          racket/gui/base
          framework)

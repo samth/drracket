@@ -1,4 +1,8 @@
 #lang at-exp racket/base
+
+(module+ test
+  (module config info
+    (define lock-name "x-server")))
 (require "private/drracket-test-util.rkt"
          framework/test
          racket/class

@@ -1,4 +1,8 @@
 #lang scheme/base
+
+(module+ test
+  (module config info
+    (define lock-name "x-server")))
 (require scheme/file
          scheme/class
          scheme/port

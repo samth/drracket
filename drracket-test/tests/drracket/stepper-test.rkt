@@ -1,4 +1,8 @@
 
+
+(module+ test
+  (module config info
+    (define lock-name "x-server")))
 (module stepper-test mzscheme
   (require mred
            mzlib/class

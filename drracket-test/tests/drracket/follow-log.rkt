@@ -1,5 +1,9 @@
 #lang racket/base
 
+(module+ test
+  (module config info
+    (define lock-name "x-server")))
+
 #|
 
 This file sets up a log receiver and then
@@ -123,4 +127,3 @@ log message was reported.
       (queue-callback
        (λ () 
          (run-drracket-script))))))
-

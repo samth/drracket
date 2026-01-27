@@ -1,4 +1,8 @@
 #lang racket/base
+
+(module+ test
+  (module config info
+    (define lock-name "x-server")))
 (require racket/gui/base)
 (require racket/runtime-path)
 (define-runtime-path here "snip")

@@ -1,4 +1,8 @@
 
+
+(module+ test
+  (module config info
+    (define lock-name "x-server")))
 (module sample-solutions-one-window mzscheme
   (require "private/drracket-test-util.rkt"
            "private/gui.rkt"
