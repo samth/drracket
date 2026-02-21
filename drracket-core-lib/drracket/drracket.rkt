@@ -49,7 +49,7 @@
                (dynamic-require 'compiler/cm 'make-compilation-manager-load/use-compiled-handler))))
    (flprintf "PLTDRDEBUG: installing CM to load/create errortrace zos\n")
    (current-compile zo-compile)
-   (use-compiled-file-paths (list (build-path compiled-dir "errortrace")))
+   (use-compiled-file-paths (list (build-path compiled-dir "errortrace-drdebug")))
    (current-load/use-compiled (make-compilation-manager-load/use-compiled-handler))
    (error-display-handler (dynamic-require 'errortrace/errortrace-lib
                                            'errortrace-error-display-handler))
