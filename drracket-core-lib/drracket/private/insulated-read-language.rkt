@@ -127,9 +127,27 @@ Will not work with the definitions text surrogate interposition that
                    (λ () 3arg-racket-lexer)
                    'get-insulated-module-lexer/inside))
   (λ (in offset mode)
+    (define-values (line-before col-before pos-before) (port-next-location in))
     (call-in-irl-context/abort
      an-irl
-     (λ () (3arg-racket-lexer in offset mode))
+     (λ ()
+       (define-values (line col pos) (port-next-location in))
+       (cond
+         [(= pos pos-before)
+          (3arg-racket-lexer in offset mode)]
+         [else
+          ;; if the values from port-next-location aren't the same,
+          ;; then the `module-lexer` consumed some of the input before
+          ;; failing. In that case we'll stick with whatever it
+          ;; consumed, but giving it an error token
+          (values "error token"
+                  'error
+                  #f
+                  pos-before
+                  pos
+                  0 ;; backup
+                  #f ;; mode
+                  )]))
      (λ () (module-lexer in offset mode)))))
 
 (define (get-definitions-text-surrogate an-irl)
@@ -190,28 +208,36 @@ Will not work with the definitions text surrogate interposition that
                    'call-read-language/inside key default))
   (case key
     [(color-lexer)
-     (define (failing-lexer in)
+     (define (failing-lexer pos-before in)
        (define-values (_1 _2 pos) (port-next-location in))
-       (define c (read-char in))
        (cond
-         [(eof-object? c)
-          (values c 'eof #f #f #f)]
+         [(= pos-before pos)
+          (define c (read-char in))
+          (cond
+            [(eof-object? c)
+             (values c 'eof #f #f #f)]
+            [else
+             (values (string c)
+                     'error
+                     #f
+                     pos
+                     (+ pos 1))])]
          [else
-          (values (string c)
+          (values "error"
                   'error
                   #f
-                  pos
-                  (+ pos 1))]))
+                  pos-before
+                  pos)]))
      (cond
        [(procedure-arity-includes? val 3)
         (λ (in in-start-pos lexer-mode)
+          (define-values (_line1 _col1 pos-before) (port-next-location in))
           (call-in-irl-context/abort
            an-irl
            (λ ()
-             (define-values (a b c d e) (failing-lexer in))
+             (define-values (a b c d e) (failing-lexer pos-before in))
              (values a b c d e 0 #f))
            (λ ()
-             (define-values (_line1 _col1 pos-before) (port-next-location in))
              (define-values (lexeme type data new-token-start new-token-end
                                     backup-delta new-lexer-mode/cont)
                (val in in-start-pos lexer-mode))
@@ -223,11 +249,11 @@ Will not work with the definitions text surrogate interposition that
                      backup-delta new-lexer-mode/cont))))]
        [else
         (λ (in)
+          (define-values (_line1 _col1 pos-before) (port-next-location in))
           (call-in-irl-context/abort
            an-irl
-           (λ () (failing-lexer in))
+           (λ () (failing-lexer pos-before in))
            (λ ()
-             (define-values (_line1 _col1 pos-before) (port-next-location in))
              (define-values (lexeme type data new-token-start new-token-end)
                (val in))
              (define-values (_line2 _col2 pos-after) (port-next-location in))
