@@ -475,8 +475,32 @@
              (set-hash-lang-comment-end+last-location #f #f)
              (clear-things-out)])))
 
+      (define moving-to-new-language? #f)
+      (define pending-language-change? #f)
+      (define pending-irl-cache-flush? #f)
+
       (define/public (move-to-new-language [flush-irl-cache? #f])
         (when timer (send timer stop))
+        (cond
+          [moving-to-new-language?
+           ;; Loading a language can yield to GUI callbacks. Defer another
+           ;; change until the active load finishes instead of reentering it.
+           (set! pending-language-change? #t)
+           (set! pending-irl-cache-flush?
+                 (or pending-irl-cache-flush? flush-irl-cache?))]
+          [else
+           (dynamic-wind
+            (λ () (set! moving-to-new-language? #t))
+            (λ ()
+              (let loop ([flush-irl-cache? flush-irl-cache?])
+                (set! pending-language-change? #f)
+                (set! pending-irl-cache-flush? #f)
+                (move-to-new-language/now flush-irl-cache?)
+                (when (and pending-language-change? in-module-language?)
+                  (loop pending-irl-cache-flush?))))
+            (λ () (set! moving-to-new-language? #f)))]))
+
+      (define/private (move-to-new-language/now flush-irl-cache?)
         (send (get-tab) set-hash-lang-error-state #f)
         (define port (open-input-text-editor this))
         (reset-irl! the-irl port (get-irl-directory) flush-irl-cache?)
@@ -488,7 +512,10 @@
           (preferences:set 'drracket:most-recent-lang-line (string-append hash-lang-language
                                                                           "\n")))
         (unless hash-lang-last-location
-          (set-hash-lang-comment-end+last-location (get-read-language-last-position the-irl) 0))
+          (define last-position (get-read-language-last-position the-irl))
+          ;; A failed insulated reader has no position information. Keep both
+          ;; positions #f so later edits can try loading the language again.
+          (set-hash-lang-comment-end+last-location last-position (and last-position 0)))
         
         (clear-things-out)
 
