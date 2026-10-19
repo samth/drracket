@@ -9,6 +9,7 @@
                         ("teaching-lang-sharing-modules.rkt" 600)
                         ("no-write-and-frame-leak.rkt" 300)
                         ("separate-process.rkt" 900)
+                        ("separate-process-output-order.rkt" 900)
                         ("test-engine-test.rkt" 300)))
 
 (define test-responsibles '(("test-engine-test.rkt" sperber)
