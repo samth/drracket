@@ -553,3 +553,15 @@ f: contract violation
    3
 }
       )
+
+;; killing threads while they write must not lose or block later output
+(test @t{#lang racket/base
+         (for ([i (in-range 500)])
+           (define t (thread (lambda ()
+                               (for ([j (in-range 20)]) (write-string "x"))
+                               (sync never-evt))))
+           (sleep 0)
+           (kill-thread t))
+         (display "done")}
+      #f
+      #rx"^x*done$")
